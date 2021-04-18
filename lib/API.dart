@@ -335,6 +335,49 @@ class API{
     // }
   }
 
+static getnewsbyareacheck(var  areaname ) async{
+    success = "false";
+    String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserAlertsbyarea";
+
+    FormData formData = new FormData.fromMap({
+      'area': areaname.toString(),
+    });
+
+    Dio dio = new Dio();
+    try {
+      dio.post(Url, data: formData).then((response){
+        Map<String, dynamic> data = response.data;
+        var status = data['IsSuccess'];
+        if(status){
+          var records=data["ResponseObject"];
+          addresslist.clear();
+
+          for (Map i in records) {
+
+            addresslist.add(apilist(
+              id: i['AlertId'],
+              news: i['NEWS'],
+              area: i['AREA'],
+              date:i['DATE'] ,
+
+            ));
+            success = "true";
+          }
+          CheckNew.pr.hide();
+          print('done');
+        }
+        else{
+          success = "error";
+          print('error');
+        }
+      });
+
+    }catch (e) {
+      success = "error";
+      print('Error: $e');
+    }
+  }
+
 
 
   static getnewsNotification(int id ) async{
@@ -351,7 +394,7 @@ class API{
         var status = data['IsSuccess'];
         if(status){
           var records=data["ResponseObject"];
-          addresslist.clear();
+          notificationlist.clear();
           for (Map i in records) {
 
             notificationlist.add(Notificationlist(

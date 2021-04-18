@@ -233,10 +233,12 @@ class _CheckNewState extends State<CheckNew> {
                 SizedBox(height: 20,),
                 InkWell(
                     onTap: () {
-                    // CheckNew.pr.show();
-                      FutureBuilder<NewsModel>(
-                          future: API().getnewsbyarea(valueChoose4.toString()));
-                    },
+                    CheckNew.pr.show();
+                      API.getnewsbyareacheck(valueChoose4.toString());
+
+                    //   FutureBuilder<NewsModel>(
+                    //       future: API().getnewsbyarea(valueChoose4.toString()));
+                     },
                     child: Container(
                       height: 58,
                       width: 80,
@@ -263,46 +265,84 @@ class _CheckNewState extends State<CheckNew> {
                     child: Container(
                         padding: EdgeInsets.only(left: 10, right: 10),
                          child:
-                        // snapshot.data.responseObject.length == 0
-                        //     ? Container(
-                        //   child: Center(
-                        //     child: Text(
-                        //       'No News Found',
-                        //       style: TextStyle(color: Colors.black),
-                        //     ),
-                        //   ),
-                        // )
-                         //   :
-                        FutureBuilder<NewsModel>(
-                          future: API().getnewsbyarea(valueChoose4.toString()),
-                            builder: (ct,sp){
-                              return ListView.builder(
-                                  itemCount: sp.data.responseObject.length,
-                                  scrollDirection: Axis.vertical,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return Container(
-                                        padding: EdgeInsets.only(left: 3, right: 3),
-                                        width:
-                                        MediaQuery.of(context).size.width / 2,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(5),
-                                          // image: DecorationImage(
-                                          //   image: AssetImage(earnList[index].image),
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                        ),
-                                        child: Column(children: [
-                                          Text(
-                                            addresslist[index].news,
-                                            style: TextStyle(color: Colors.black),
-                                          ),
-                                          Divider(
-                                              indent: 20,
-                                              endIndent: 20,
-                                              color: AppColors.mainColor),
-                                        ]));
-                                  });
-                        })),
+                        addresslist.length== 0
+                            ?
+                        RefreshIndicator(
+                          onRefresh: _getData,
+                       child: SingleChildScrollView(
+                         child: Container(
+                           height: MediaQuery.of(context).size.height/1.8,
+                            child: Center(
+                              child: Text(
+                                'No News Found',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ),
+                       )
+                        )
+                           :RefreshIndicator(
+                       child:  ListView.builder(
+                         physics:BouncingScrollPhysics(),
+                             itemCount: addresslist.length,
+                             scrollDirection: Axis.vertical,
+                             itemBuilder: (BuildContext context, int index) {
+                               return Container(
+                                   padding: EdgeInsets.only(left: 3, right: 3),
+                                   width:
+                                   MediaQuery.of(context).size.width / 2,
+                                   decoration: BoxDecoration(
+                                     borderRadius: BorderRadius.circular(5),
+                                     // image: DecorationImage(
+                                     //   image: AssetImage(earnList[index].image),
+                                     //   fit: BoxFit.cover,
+                                     // ),
+                                   ),
+                                   child: Column(children: [
+                                     Text(
+                                      addresslist[index].news,
+                                       style: TextStyle(color: Colors.black),
+                                     ),
+                                     Divider(
+                                         indent: 20,
+                                         endIndent: 20,
+                                         color: AppColors.mainColor),
+                                   ]));
+                             }),
+                          onRefresh:_getData ,
+                        )
+
+                        // FutureBuilder<NewsModel>(
+                        //   future: API().getnewsbyarea(valueChoose4.toString()),
+                        //     builder: (ct,sp){
+                        //       return ListView.builder(
+                        //           itemCount: sp.data.responseObject.length,
+                        //           scrollDirection: Axis.vertical,
+                        //           itemBuilder: (BuildContext context, int index) {
+                        //             return Container(
+                        //                 padding: EdgeInsets.only(left: 3, right: 3),
+                        //                 width:
+                        //                 MediaQuery.of(context).size.width / 2,
+                        //                 decoration: BoxDecoration(
+                        //                   borderRadius: BorderRadius.circular(5),
+                        //                   // image: DecorationImage(
+                        //                   //   image: AssetImage(earnList[index].image),
+                        //                   //   fit: BoxFit.cover,
+                        //                   // ),
+                        //                 ),
+                        //                 child: Column(children: [
+                        //                   Text(
+                        //                     sp.data.responseObject[index].nEWS,
+                        //                     style: TextStyle(color: Colors.black),
+                        //                   ),
+                        //                   Divider(
+                        //                       indent: 20,
+                        //                       endIndent: 20,
+                        //                       color: AppColors.mainColor),
+                        //                 ]));
+                        //           });
+                        // })
+                    ),
                   ),
                 ),
 
@@ -311,5 +351,13 @@ class _CheckNewState extends State<CheckNew> {
             )),
       ),
     );
+  }
+  Future<void> _getData() async {
+    setState(() {
+      setState(() {
+        addresslist.length;
+      });
+
+    });
   }
 }

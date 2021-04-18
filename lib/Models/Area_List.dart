@@ -2,8 +2,6 @@ List listItem4 = [
   "Gulberg Town",
   "Liaquatabad Town",
   "New Karachi Town",
-  "Murad Memo",
-  "Shah Murad",
   "North Nazimabad",
   "Nazimabad",
   "Gulshan Town",
