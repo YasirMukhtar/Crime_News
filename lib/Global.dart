@@ -1,0 +1,14 @@
+var status;
+var userlogin;
+var newsResult;
+var Response;
+var area ;
+var userid;
+var success;
+var  userId;
+var name;
+var Email;
+var password;
+var LOCATION_X;
+var LOCATION_Y;
+var userarea;
