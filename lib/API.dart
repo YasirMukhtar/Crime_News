@@ -217,7 +217,7 @@ class API{
 
   static CheckNews(BuildContext context ,news ){
     FormData data = FormData.fromMap({
-      "msg": news,
+      "msg": news.toString(),
 
     });
 
@@ -234,6 +234,7 @@ class API{
 
         if (newsResult == true){
           print(userlogin);
+          Home.pr.hide();
           Fluttertoast.showToast(
               msg: "Its a Crime News",
               toastLength: Toast.LENGTH_SHORT,
@@ -246,8 +247,9 @@ class API{
 
         }
         else if (newsResult == false){
+          Home.pr.hide();
           Fluttertoast.showToast(
-              msg: "Its not  Crime News",
+              msg: "Its not Crime News",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
@@ -270,13 +272,13 @@ class API{
     // success = "false";
     // String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserAlertsbyarea";
 
-    Map<String, dynamic> jsonMap = {
+    Map jsonMap = {
       'area': areaname.toString(),
 
     };
+    String body = json.encode(jsonMap);
     try {
-      final http.Response response =
-      await http.post(Uri.http('http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserAlertsbyarea' , jsonMap));
+      http.Response response = await http.post("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserAlertsbyarea", body: body,);
 
       if (response.statusCode == 201) {
         return NewsModel.fromJson(jsonDecode(response.body));

@@ -1,6 +1,7 @@
 import 'package:crime_news/API.dart';
 import 'package:crime_news/Component/Color/color.dart';
 import 'package:crime_news/Component/Style/style.dart';
+import 'package:crime_news/Models/Area_List.dart';
 import 'package:crime_news/Models/news_model.dart';
 import 'package:crime_news/Models/newsbyareaModel.dart';
 import 'package:crime_news/Screens/IntroPage.dart';
@@ -18,40 +19,10 @@ class _CheckNewState extends State<CheckNew> {
 
 
   String valueChoose1;
-  List listItem1 = [
-    "English",
-    "Spanish",
-    "Urdu",
-  ];
-
   String valueChoose2;
-  List listItem2 = [
-    "Addidas",
-    "Nike",
-
-  ];
-
   String valueChoose3;
-  List listItem3 = [
-    "Addidas",
-    "Nike",
-
-  ];
-
   String valueChoose4;
-  List listItem4 = [
-    "lyari",
-    "karachi",
-    "Malir",
-    "Gulberg Town",
-    "Liaquatabad Town",
-   "New Karachi Town",
-    "Murad Memo",
-    "Shah Murad",
 
-
-
-  ];
   @override
   initState() {
     // TODO: implement initState
@@ -104,7 +75,7 @@ class _CheckNewState extends State<CheckNew> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width/2.5,
+                      width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
                         border: Border.all(color:Colors.grey[400]),
@@ -120,7 +91,7 @@ class _CheckNewState extends State<CheckNew> {
                         ),
                         iconSize: 12,
                         underline: SizedBox(),
-                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        style: TextStyle(color: Colors.black, fontSize: 13),
                         value: valueChoose1,
                         onChanged: (newValue) {
                           setState(() {
@@ -141,7 +112,7 @@ class _CheckNewState extends State<CheckNew> {
                       ),
                     ),
                     Container(
-                      width: MediaQuery.of(context).size.width/2.5,
+                      width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
                         border: Border.all(color:Colors.grey[400]),
@@ -157,7 +128,7 @@ class _CheckNewState extends State<CheckNew> {
                         ),
                         iconSize: 12,
                         underline: SizedBox(),
-                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        style: TextStyle(color: Colors.black, fontSize: 13),
                         value: valueChoose2,
                         onChanged: (newValue) {
                           setState(() {
@@ -184,7 +155,7 @@ class _CheckNewState extends State<CheckNew> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width/2.5,
+                      width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
                         border: Border.all(color:Colors.grey[400]),
@@ -200,7 +171,7 @@ class _CheckNewState extends State<CheckNew> {
                         ),
                         iconSize: 12,
                         underline: SizedBox(),
-                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        style: TextStyle(color: Colors.black, fontSize: 13),
                         value: valueChoose3,
                         onChanged: (newValue) {
                           setState(() {
@@ -221,14 +192,14 @@ class _CheckNewState extends State<CheckNew> {
                       ),
                     ),
                     Container(
-                      width: MediaQuery.of(context).size.width/2.5,
+                      width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
                         border: Border.all(color:Colors.grey[400]),
                         borderRadius: BorderRadius.circular(5.0),),
                       child: DropdownButton(
                         isExpanded: true,
-                        hint: Text('Select Tow'),
+                        hint: Text('Select Town'),
                         dropdownColor: Colors.grey[100],
                         icon: Icon(
                           Icons.keyboard_arrow_down_outlined,
@@ -237,7 +208,7 @@ class _CheckNewState extends State<CheckNew> {
                         ),
                         iconSize: 12,
                         underline: SizedBox(),
-                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        style: TextStyle(color: Colors.black, fontSize: 13),
                         value: valueChoose4,
                         onChanged: (newValue) {
                           setState(() {
@@ -291,16 +262,18 @@ class _CheckNewState extends State<CheckNew> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Container(
                         padding: EdgeInsets.only(left: 10, right: 10),
-                        child: addresslist.length == 0
-                            ? Container(
-                          child: Center(
-                            child: Text(
-                              'No News Found',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        )
-                            : FutureBuilder<NewsModel>(
+                         child:
+                        // snapshot.data.responseObject.length == 0
+                        //     ? Container(
+                        //   child: Center(
+                        //     child: Text(
+                        //       'No News Found',
+                        //       style: TextStyle(color: Colors.black),
+                        //     ),
+                        //   ),
+                        // )
+                         //   :
+                        FutureBuilder<NewsModel>(
                           future: API().getnewsbyarea(valueChoose4.toString()),
                             builder: (ct,sp){
                               return ListView.builder(

@@ -15,11 +15,13 @@ import 'package:crime_news/Screens/IntroPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../API.dart';
 
 class Home extends StatefulWidget {
+  static ProgressDialog pr;
   @override
   _HomeState createState() => _HomeState();
 }
@@ -35,6 +37,7 @@ class _HomeState extends State<Home> {
   @override
   initState() {
     // TODO: implement initState
+    Home.pr = ProgressDialog(context);
     setBool();
 
     final loginarea =  Splash.prefs.getString('userAREA');
@@ -195,7 +198,14 @@ StartTime() async{
                           key: _formKey,
                           child: Container(
                             width: MediaQuery.of(context).size.width / 1.55,
-                            child: TextField(
+                            child: TextFormField(
+                              controller: newsController,
+                              validator:  (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter some text';
+                                }
+                                return null;
+                              },
                               decoration: InputDecoration(
                                 border: new OutlineInputBorder(
                                     borderRadius: const BorderRadius.all(
@@ -215,7 +225,8 @@ StartTime() async{
                         InkWell(
                             onTap: () {
                               if (_formKey.currentState.validate()) {
-                                API.CheckNews(context, newsController.text);
+                                Home.pr.show();
+                                API.CheckNews(context, newsController.text.toString());
                               }
                             },
                             child: Container(

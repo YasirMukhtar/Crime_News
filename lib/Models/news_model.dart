@@ -1,11 +1,11 @@
 class NewsModel {
   bool isSuccess;
   List<ResponseObject> responseObject;
-  Null responseString;
-  Null error;
-  Null requestedObject;
-  Null redirectionUrl;
-  Null exception;
+  String responseString;
+  String error;
+  String requestedObject;
+  String redirectionUrl;
+  String exception;
 
   NewsModel(
       {this.isSuccess,
