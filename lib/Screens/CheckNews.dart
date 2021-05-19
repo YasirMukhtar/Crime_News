@@ -5,9 +5,13 @@ import 'package:crime_news/Models/Area_List.dart';
 import 'package:crime_news/Models/news_model.dart';
 import 'package:crime_news/Models/newsbyareaModel.dart';
 import 'package:crime_news/Screens/IntroPage.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Global.dart';
 
 class CheckNew extends StatefulWidget {
   static ProgressDialog pr;
@@ -23,12 +27,70 @@ class _CheckNewState extends State<CheckNew> {
   String valueChoose3;
   String valueChoose4;
 
+
+
+   getnewsbyareacheck(var  areaname ) async{
+     CheckNew.pr.show();
+    success = "false";
+    String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserAlertsbyarea";
+
+    FormData formData = new FormData.fromMap({
+      'area': areaname.toString(),
+    });
+
+    Dio dio = new Dio();
+    try {
+      dio.post(Url, data: formData).then((response){
+        Map<String, dynamic> data = response.data;
+        var status = data['IsSuccess'];
+        if(status){
+          var records=data["ResponseObject"];
+          addresslist.clear();
+
+          for (Map i in records) {
+            // setState((){
+              addresslist.add(apilist(
+                id: i['AlertId'],
+                news: i['NEWS'],
+                area: i['AREA'],
+                date:i['DATE'] ,
+
+              ));
+            // });
+
+            success = "true";
+          }
+          CheckNew.pr.hide();
+          setState(() {
+            addresslist;
+          });
+          print('done');
+        }
+        else{
+          success = "error";
+          print('error');
+        }
+      });
+
+    }catch (e) {
+      success = "error";
+      print('Error: $e');
+    }
+  }
   @override
   initState() {
     // TODO: implement initState
     CheckNew.pr = ProgressDialog(context);
     super.initState();
   }
+
+  @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   setState(() {
+  //     updateListView();
+  //   });
+  // }
 
   @override
   final _formKey = GlobalKey<FormState>();
@@ -111,7 +173,7 @@ class _CheckNewState extends State<CheckNew> {
                         }).toList(),
                       ),
                     ),
-                    Container(
+                    valueChoose1 != null ?  Container(
                       width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
@@ -146,21 +208,21 @@ class _CheckNewState extends State<CheckNew> {
                             ),
                           );
                         }).toList(),
-                      ),
-                    ),
+                      ) ,
+                    ):Container(height: 2, width: 10,),
                   ],
                 ),
                 SizedBox(height: 10,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Container(
+                valueChoose2 != null ? Container(
                       width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
                         border: Border.all(color:Colors.grey[400]),
                         borderRadius: BorderRadius.circular(5.0),),
-                      child: DropdownButton(
+                      child:DropdownButton(
                         isExpanded: true,
                         hint: Text('Select District '),
                         dropdownColor: Colors.grey[100],
@@ -190,8 +252,8 @@ class _CheckNewState extends State<CheckNew> {
                           );
                         }).toList(),
                       ),
-                    ),
-                    Container(
+                    ):Container(),
+      valueChoose3 != null ?Container(
                       width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
@@ -226,15 +288,16 @@ class _CheckNewState extends State<CheckNew> {
                             ),
                           );
                         }).toList(),
-                      ),
-                    ),
+                      ) ,
+                    ):Container(),
                   ],
                 ),
                 SizedBox(height: 20,),
                 InkWell(
                     onTap: () {
-                    CheckNew.pr.show();
-                      API.getnewsbyareacheck(valueChoose4.toString());
+
+                      valueChoose4 != null? getnewsbyareacheck(valueChoose4.toString()):   Fluttertoast.showToast(
+                          msg: "Select Fields!", toastLength: Toast.LENGTH_LONG);;
 
                     //   FutureBuilder<NewsModel>(
                     //       future: API().getnewsbyarea(valueChoose4.toString()));

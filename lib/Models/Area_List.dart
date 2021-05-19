@@ -10,7 +10,7 @@ List listItem4 = [
   "Gulshan-E-Iqbal",
   "Gulzar-E-Hijri",
   "Lyari",
-  "Saddar Town",
+  "saddar",
   "Aram Bahg",
   "Civil Line",
   "Garden",
@@ -57,7 +57,5 @@ List listItem2 = [
 ];
 List listItem1 = [
   "Sindh",
-  "Punjab",
-  "KPK",
-  "Balochistan",
+
 ];

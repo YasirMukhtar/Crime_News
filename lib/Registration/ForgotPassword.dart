@@ -95,7 +95,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     SizedBox(height: 45.0),
                     Container(
                       width: 350,
-                      height: 50,
+                      height: 60,
                       child: TextFormField(
                         controller: emailController,
                         validator: (value) {
