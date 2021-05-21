@@ -12,3 +12,5 @@ var password;
 var LOCATION_X;
 var LOCATION_Y;
 var userarea;
+var response;
+var dataResponse;

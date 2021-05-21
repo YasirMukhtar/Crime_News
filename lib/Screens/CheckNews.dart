@@ -81,6 +81,7 @@ class _CheckNewState extends State<CheckNew> {
   initState() {
     // TODO: implement initState
     CheckNew.pr = ProgressDialog(context);
+    addresslist.clear();
     super.initState();
   }
 

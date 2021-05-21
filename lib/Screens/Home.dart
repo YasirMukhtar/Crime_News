@@ -12,6 +12,7 @@ import 'package:crime_news/Registration/login.dart';
 import 'package:crime_news/Screens/CheckNews.dart';
 import 'package:crime_news/Screens/CustomeDialogNews.dart';
 import 'package:crime_news/Screens/IntroPage.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,17 +35,116 @@ class _HomeState extends State<Home> {
 
   }
 
+  getnewsbyareacheck(var  areaname ) async{
+    CheckNew.pr.show();
+    success = "false";
+    String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserAlertsbyarea";
+
+    FormData formData = new FormData.fromMap({
+      'area': areaname.toString(),
+    });
+
+    Dio dio = new Dio();
+    try {
+      dio.post(Url, data: formData).then((response){
+        Map<String, dynamic> data = response.data;
+        var status = data['IsSuccess'];
+        if(status){
+          var records=data["ResponseObject"];
+          addresslist.clear();
+
+          for (Map i in records) {
+            // setState((){
+            addresslist.add(apilist(
+              id: i['AlertId'],
+              news: i['NEWS'],
+              area: i['AREA'],
+              date:i['DATE'] ,
+
+            ));
+            // });
+
+            success = "true";
+          }
+          CheckNew.pr.hide();
+          setState(() {
+            addresslist;
+          });
+          print('done');
+        }
+        else{
+          success = "error";
+          print('error');
+        }
+      });
+
+    }catch (e) {
+      success = "error";
+      print('Error: $e');
+    }
+  }
+
+   getusernews(var  areaname , var id ) async{
+    success = "false";
+    String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserUnreadAlertsbyArea";
+    FormData formData = new FormData.fromMap({
+      'UserId' : id ,
+      'area': areaname.toString(),
+    });
+
+    Dio dio = new Dio();
+    try {
+      dio.post(Url, data: formData).then((response){
+        Map<String, dynamic> data = response.data;
+        var status = data['IsSuccess'];
+        if(status){
+          var records=data["ResponseObject"];
+          usernewslist.clear();
+          for (Map i in records) {
+
+            usernewslist.add(Usernewslist(
+              id: i['AlertId'],
+              news: i['NEWS'],
+              area: i['AREA'],
+              date:i['DATE'] ,
+
+            ));
+            success = "true";
+          }
+          setState(() {
+            addresslist;
+          });
+          print('done');
+        }
+        else{
+          success = "error";
+          print('error');
+        }
+      });
+
+    }catch (e) {
+      success = "error";
+      print('Error: $e');
+    }
+  }
+
   @override
   initState() {
     // TODO: implement initState
     Home.pr = ProgressDialog(context);
     setBool();
 
-    final loginarea =  Splash.prefs.getString('userAREA');
-    final  loginid =  Splash.prefs.getString('userID');
+    CheckNew.pr = ProgressDialog(context);
+   // addresslist.clear();
 
-    API.getusernews( loginarea , loginid );
-    StartTime();
+     final loginarea =  Splash.prefs.getString('userAREA');
+     getnewsbyareacheck( loginarea);
+    // final  loginid =  Splash.prefs.getString('userID');
+    //  print(loginarea);
+    //  print(loginid);
+    //
+    // getusernews( loginarea , loginid );
+   // StartTime();
     super.initState();
   }
 
@@ -124,41 +224,77 @@ StartTime() async{
                     child: Container(
                         padding: EdgeInsets.only(left: 10, right: 10),
                         height: MediaQuery.of(context).size.height / 1.15,
-                        child: usernewslist.length == 0
-                            ? Container(
+                        child: addresslist.length== 0
+                            ?  RefreshIndicator(
+                            onRefresh: _getData,
+                            child: SingleChildScrollView(
+                              child: Container(
+                                height: MediaQuery.of(context).size.height/1.8,
                                 child: Center(
                                   child: Text(
                                     'No News Found',
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ),
-                              )
-                            : ListView.builder(
-                                itemCount: usernewslist.length,
-                                scrollDirection: Axis.vertical,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                      padding: EdgeInsets.only(left: 3, right: 3),
-                                      width:
-                                          MediaQuery.of(context).size.width / 2,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        // image: DecorationImage(
-                                        //   image: AssetImage(earnList[index].image),
-                                        //   fit: BoxFit.cover,
-                                        // ),
+                              ),
+                            )
+                        )
+                            :RefreshIndicator(
+                          child:   ListView.builder(
+                              physics:BouncingScrollPhysics(),
+                              itemCount: addresslist.length,
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Container(
+                                    padding: EdgeInsets.only(left: 3, right: 3),
+                                    width:
+                                    MediaQuery.of(context).size.width / 2,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      // image: DecorationImage(
+                                      //   image: AssetImage(earnList[index].image),
+                                      //   fit: BoxFit.cover,
+                                      // ),
+                                    ),
+                                    child: Column(children: [
+                                      Text(
+                                        addresslist[index].news == null ? ' No News ':addresslist[index].news,
+                                        style: TextStyle(color: Colors.black),
                                       ),
-                                      child: Column(children: [
-                                        Text(
-                                          usernewslist[index].news,
-                                          style: TextStyle(color: Colors.black),
-                                        ),
-                                        Divider(
-                                            indent: 20,
-                                            endIndent: 20,
-                                            color: AppColors.mainColor),
-                                      ]));
-                                })),
+                                      Divider(
+                                          indent: 20,
+                                          endIndent: 20,
+                                          color: AppColors.mainColor),
+                                    ]));
+                              }),
+                          // ListView.builder(
+                          //     itemCount: usernewslist.length,
+                          //     scrollDirection: Axis.vertical,
+                          //     itemBuilder: (BuildContext context, int index) {
+                          //       return Container(
+                          //           padding: EdgeInsets.only(left: 3, right: 3),
+                          //           width:
+                          //           MediaQuery.of(context).size.width / 2,
+                          //           decoration: BoxDecoration(
+                          //             borderRadius: BorderRadius.circular(5),
+                          //             // image: DecorationImage(
+                          //             //   image: AssetImage(earnList[index].image),
+                          //             //   fit: BoxFit.cover,
+                          //             // ),
+                          //           ),
+                          //           child: Column(children: [
+                          //             Text(
+                          //               usernewslist[index].news,
+                          //               style: TextStyle(color: Colors.black),
+                          //             ),
+                          //             Divider(
+                          //                 indent: 20,
+                          //                 endIndent: 20,
+                          //                 color: AppColors.mainColor),
+                          //           ]));
+                          //     }),
+                          onRefresh:_getData ,
+                        )),
                   ),
 
                   Spacer(),
@@ -253,5 +389,13 @@ StartTime() async{
         ),
       ),
     );
+  }
+  Future<void> _getData() async {
+    setState(() {
+      setState(() {
+        addresslist.length;
+      });
+
+    });
   }
 }

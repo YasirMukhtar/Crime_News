@@ -229,6 +229,7 @@ class API{
       print(response.statusCode);
       Map<String, dynamic> data = response.data;
       newsResult = data['ResponseObject'];
+      dataResponse = data['ResponseString'];
       print(newsResult);
       if (response.statusCode == 200) {
 
@@ -236,7 +237,7 @@ class API{
           print(userlogin);
           Home.pr.hide();
           Fluttertoast.showToast(
-              msg: "Its a Crime News",
+              msg: dataResponse.toString(),
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
@@ -421,44 +422,44 @@ static getnewsbyareacheck(var  areaname ) async{
     }
   }
 
-  static getusernews(var  areaname , var id ) async{
-    success = "false";
-    String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserUnreadAlertsbyArea";
-    FormData formData = new FormData.fromMap({
-      'UserId' : id ,
-      'area': areaname.toString(),
-    });
-
-    Dio dio = new Dio();
-    try {
-      dio.post(Url, data: formData).then((response){
-        Map<String, dynamic> data = response.data;
-        var status = data['IsSuccess'];
-        if(status){
-          var records=data["ResponseObject"];
-          usernewslist.clear();
-          for (Map i in records) {
-
-            usernewslist.add(Usernewslist(
-              id: i['AlertId'],
-              news: i['NEWS'],
-              area: i['AREA'],
-              date:i['DATE'] ,
-
-            ));
-            success = "true";
-          }
-          print('done');
-        }
-        else{
-          success = "error";
-          print('error');
-        }
-      });
-
-    }catch (e) {
-      success = "error";
-      print('Error: $e');
-    }
-  }
+  // static getusernews(var  areaname , var id ) async{
+  //   success = "false";
+  //   String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserUnreadAlertsbyArea";
+  //   FormData formData = new FormData.fromMap({
+  //     'UserId' : id ,
+  //     'area': areaname.toString(),
+  //   });
+  //
+  //   Dio dio = new Dio();
+  //   try {
+  //     dio.post(Url, data: formData).then((response){
+  //       Map<String, dynamic> data = response.data;
+  //       var status = data['IsSuccess'];
+  //       if(status){
+  //         var records=data["ResponseObject"];
+  //         usernewslist.clear();
+  //         for (Map i in records) {
+  //
+  //           usernewslist.add(Usernewslist(
+  //             id: i['AlertId'],
+  //             news: i['NEWS'],
+  //             area: i['AREA'],
+  //             date:i['DATE'] ,
+  //
+  //           ));
+  //           success = "true";
+  //         }
+  //         print('done');
+  //       }
+  //       else{
+  //         success = "error";
+  //         print('error');
+  //       }
+  //     });
+  //
+  //   }catch (e) {
+  //     success = "error";
+  //     print('Error: $e');
+  //   }
+  // }
 }
