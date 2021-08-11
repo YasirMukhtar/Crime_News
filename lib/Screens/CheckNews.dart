@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:crime_news/API.dart';
 import 'package:crime_news/Component/Color/color.dart';
 import 'package:crime_news/Component/Style/style.dart';
 import 'package:crime_news/Models/Area_List.dart';
+import 'package:crime_news/Models/GetCitiesModel.dart';
+import 'package:crime_news/Models/GetDistrictModel.dart';
+import 'package:crime_news/Models/GetTownModel.dart';
 import 'package:crime_news/Models/news_model.dart';
 import 'package:crime_news/Models/newsbyareaModel.dart';
 import 'package:crime_news/Screens/IntroPage.dart';
@@ -10,8 +15,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:crime_news/Models/GetStateModel.dart';
 import '../Global.dart';
+
+
 
 class CheckNew extends StatefulWidget {
   static ProgressDialog pr;
@@ -21,15 +29,120 @@ class CheckNew extends StatefulWidget {
 
 class _CheckNewState extends State<CheckNew> {
 
-
+  String _mySelection;
   String valueChoose1;
   String valueChoose2;
   String valueChoose3;
   String valueChoose4;
 
 
+  Future myFuture;
 
-   getnewsbyareacheck(var  areaname ) async{
+  final String uri = 'http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetStates';
+
+  static Future<getStateModel> GetState() async {
+    try {
+      final http.Response response =
+      await http.get("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetStates");
+
+      if (response.statusCode == 200) {
+        stateList.clear();
+
+        return getStateModel.fromJson(jsonDecode(response.body));
+      }
+    }
+    // on SocketException catch (e) {
+    //   throw NoInternetExceptions("No Internet", "assets/internet.png");
+    // } on HttpException catch (e) {
+    //   throw HttpException("No Service found");
+    // } on FormatException catch (e) {
+    //   throw InvalidDataFormat("Invalid Data format");
+    // }
+    catch (e) {
+      throw Exception("Unknown Error");
+    }
+  }
+
+   Future<getcityModel> GetCities(var id) async {
+    try {
+      final http.Response response =
+      await http.get("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetCitiesByStateId/$id");
+
+      if (response.statusCode == 200) {
+        citiesList.clear();
+        set();
+        return getcityModel.fromJson(jsonDecode(response.body));
+      }
+    }
+    // on SocketException catch (e) {
+    //   throw NoInternetExceptions("No Internet", "assets/internet.png");
+    // } on HttpException catch (e) {
+    //   throw HttpException("No Service found");
+    // } on FormatException catch (e) {
+    //   throw InvalidDataFormat("Invalid Data format");
+    // }
+    catch (e) {
+      throw Exception("Unknown Error");
+    }
+  }
+   Future<getdistrictModel> GetDistrict(var id) async {
+    try {
+      final http.Response response =
+      await http.get("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetDistrictByCityId/$id");
+
+      if (response.statusCode == 200) {
+        districtList.clear();
+        set();
+        return getdistrictModel.fromJson(jsonDecode(response.body));
+      }
+    }
+    // on SocketException catch (e) {
+    //   throw NoInternetExceptions("No Internet", "assets/internet.png");
+    // } on HttpException catch (e) {
+    //   throw HttpException("No Service found");
+    // } on FormatException catch (e) {
+    //   throw InvalidDataFormat("Invalid Data format");
+    // }
+    catch (e) {
+      throw Exception("Unknown Error");
+    }
+  }
+
+  set(){
+
+    new Future.delayed(new Duration(milliseconds: 1500), () {
+      setState(() {
+
+      });
+    });
+  }
+
+   Future<getTownModel> GetTown(var id) async {
+    try {
+      final http.Response response =
+      await http.get("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetTownByDistrictId/$id");
+
+      if (response.statusCode == 200) {
+        townList.clear();
+        set();
+        return getTownModel.fromJson(jsonDecode(response.body));
+
+      }
+    }
+    // on SocketException catch (e) {
+    //   throw NoInternetExceptions("No Internet", "assets/internet.png");
+    // } on HttpException catch (e) {
+    //   throw HttpException("No Service found");
+    // } on FormatException catch (e) {
+    //   throw InvalidDataFormat("Invalid Data format");
+    // }
+    catch (e) {
+      throw Exception("Unknown Error");
+    }
+  }
+
+
+  getnewsbyareacheck(var  areaname ) async{
      CheckNew.pr.show();
     success = "false";
     String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserAlertsbyarea";
@@ -80,8 +193,14 @@ class _CheckNewState extends State<CheckNew> {
   @override
   initState() {
     // TODO: implement initState
+
     CheckNew.pr = ProgressDialog(context);
     addresslist.clear();
+    setState(() {
+      // myFuture = GetState();
+    });
+
+    // myFuture = GetCities();
     super.initState();
   }
 
@@ -134,6 +253,24 @@ class _CheckNewState extends State<CheckNew> {
             child: Column(
               children: [
                 SizedBox(height: 20,),
+              //    FutureBuilder<getStateModel>(
+              // future: myFuture,
+              // builder: (context, snapshot) {
+              //   if (!snapshot.hasData)
+              //     return Center(child: Container());
+              //   return  Container(
+              //         child: DropdownButton(
+              //                 items: stateList.map((item)=>DropdownMenuItem<String>(child: Text(item.name), value: item.name,)
+              //                 ).toList(),
+              //                 onChanged: (newVal) {
+              //                   setState(() {
+              //                     selectedSpinnerItem = newVal;
+              //                   });
+              //                 },
+              //                 value: selectedSpinnerItem,
+              //               )
+              //             );
+              // }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -156,22 +293,24 @@ class _CheckNewState extends State<CheckNew> {
                         underline: SizedBox(),
                         style: TextStyle(color: Colors.black, fontSize: 13),
                         value: valueChoose1,
-                        onChanged: (newValue) {
+                        onChanged: (newValue ) {
                           setState(() {
+                            citiesList.clear();
+                            districtList.clear();
+                            townList.clear();
                             valueChoose1 = newValue;
+
+                            print(newValue);
+                            GetCities(newValue);
+
+
                           });
                         },
-                        items: listItem1.map((valueItem) {
-                          return DropdownMenuItem(
-                            value: valueItem,
-                            child: new Row(
-                              //  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Text(valueItem),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                        items: stateList.map((item)=>DropdownMenuItem<String>(child:
+                            Text(item.name),
+                          value: item.stateId.toString(),
+                        )
+                        ).toList(),
                       ),
                     ),
                     valueChoose1 != null ?  Container(
@@ -182,7 +321,7 @@ class _CheckNewState extends State<CheckNew> {
                         borderRadius: BorderRadius.circular(5.0),),
                       child: DropdownButton(
                         isExpanded: true,
-                        hint: Text('Select Division'),
+                        hint: Text('Select City'),
                         dropdownColor: Colors.grey[100],
                         icon: Icon(
                           Icons.keyboard_arrow_down_outlined,
@@ -195,20 +334,18 @@ class _CheckNewState extends State<CheckNew> {
                         value: valueChoose2,
                         onChanged: (newValue) {
                           setState(() {
+                            districtList.clear();
+                            townList.clear();
                             valueChoose2 = newValue;
+                            print(newValue);
+                            GetDistrict(newValue);
                           });
                         },
-                        items: listItem2.map((valueItem) {
-                          return DropdownMenuItem(
-                            value: valueItem,
-                            child: new Row(
-                              //  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Text(valueItem),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                        items: citiesList.map((item)=>DropdownMenuItem<String>(child:
+                        Text(item.name),
+                          value: item.cityId.toString(),
+                        )
+                        ).toList(),
                       ) ,
                     ):Container(height: 2, width: 10,),
                   ],
@@ -239,22 +376,19 @@ class _CheckNewState extends State<CheckNew> {
                         onChanged: (newValue) {
                           setState(() {
                             valueChoose3 = newValue;
+                            print(newValue);
+                            townList.clear();
+                            GetTown(newValue);
                           });
                         },
-                        items: listItem3.map((valueItem) {
-                          return DropdownMenuItem(
-                            value: valueItem,
-                            child: new Row(
-                              //  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Text(valueItem),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                        items: districtList.map((item)=>DropdownMenuItem<String>(child:
+                        Text(item.name),
+                          value: item.districtId.toString()
+                        )
+                        ).toList(),
                       ),
                     ):Container(),
-      valueChoose3 != null ?Container(
+                     valueChoose3 != null ?Container(
                       width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
@@ -278,17 +412,11 @@ class _CheckNewState extends State<CheckNew> {
                             valueChoose4 = newValue;
                           });
                         },
-                        items: listItem4.map((valueItem) {
-                          return DropdownMenuItem(
-                            value: valueItem,
-                            child: new Row(
-                              //  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Text(valueItem),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                        items: townList.map((item)=>DropdownMenuItem<String>(child:
+                        Text(item.name),
+                            value: item.name.toString()
+                        )
+                        ).toList(),
                       ) ,
                     ):Container(),
                   ],
@@ -316,6 +444,7 @@ class _CheckNewState extends State<CheckNew> {
                             style: TextStyle(color: AppColors.white),
                           )),
                     )),
+
                 SizedBox(height: 20,),
 
                 Center(

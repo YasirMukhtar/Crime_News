@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:crime_news/Component/Color/color.dart';
 import 'package:crime_news/Component/Style/style.dart';
 import 'package:crime_news/Global.dart';
+import 'package:crime_news/Models/GetStateModel.dart';
 import 'package:crime_news/Models/LoginModel.dart';
 import 'package:crime_news/Models/newsbyareaModel.dart';
 import 'package:crime_news/Models/notificationModel.dart';
@@ -16,10 +18,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+
 
 import '../API.dart';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   static ProgressDialog pr;
@@ -34,7 +40,34 @@ class _HomeState extends State<Home> {
     prefs.setBool('isLoggedIn', false);
 
   }
+  Position _currentPosition;
+  final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  Future myFuture;
 
+  final String uri = 'http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetStates';
+
+  static Future<getStateModel> GetState() async {
+    try {
+      final http.Response response =
+      await http.get("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetStates");
+
+      if (response.statusCode == 200) {
+        stateList.clear();
+        datacheck=true;
+        return getStateModel.fromJson(jsonDecode(response.body));
+      }
+    }
+    // on SocketException catch (e) {
+    //   throw NoInternetExceptions("No Internet", "assets/internet.png");
+    // } on HttpException catch (e) {
+    //   throw HttpException("No Service found");
+    // } on FormatException catch (e) {
+    //   throw InvalidDataFormat("Invalid Data format");
+    // }
+    catch (e) {
+      throw Exception("Unknown Error");
+    }
+  }
   getnewsbyareacheck(var  areaname ) async{
     CheckNew.pr.show();
     success = "false";
@@ -84,24 +117,34 @@ class _HomeState extends State<Home> {
     }
   }
 
-   getusernews(var  areaname , var id ) async{
+   Future<List<Usernewslist>> getuserNotification(var  areaname , var id  , latitude , longitude) async{
+     usernewslist.clear();
+    print("getuserNotification");
     success = "false";
     String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserUnreadAlertsbyArea";
+    print("latitude is: $latitude");
+    print("latitude is: $longitude");
     FormData formData = new FormData.fromMap({
       'UserId' : id ,
-      'area': areaname.toString(),
+      'Location_X' : latitude,
+      'Location_Y' : longitude,
+      'area': '',
     });
 
     Dio dio = new Dio();
     try {
-      dio.post(Url, data: formData).then((response){
+      await dio.post(Url, data: formData).then((response){
+        print("json is: ${response.data}");
+        // var data={"IsSuccess": true, "ResponseObject": [], "ResponseString": null, "Error": null, "RequestedObject": null,
+        // "RedirectionUrl": null, "exception": null};
         Map<String, dynamic> data = response.data;
+        //Map data = response.data;
+        print("data is: $data");
         var status = data['IsSuccess'];
-        if(status){
-          var records=data["ResponseObject"];
-          usernewslist.clear();
+        if(status ){
+          List records=data["ResponseObject"];
+          print("records size: ${records.length}");
           for (Map i in records) {
-
             usernewslist.add(Usernewslist(
               id: i['AlertId'],
               news: i['NEWS'],
@@ -112,7 +155,7 @@ class _HomeState extends State<Home> {
             success = "true";
           }
           setState(() {
-            addresslist;
+            usernewslist;
           });
           print('done');
         }
@@ -121,44 +164,117 @@ class _HomeState extends State<Home> {
           print('error');
         }
       });
-
     }catch (e) {
       success = "error";
       print('Error: $e');
     }
-  }
+    finally{
+      return usernewslist;
+    }
 
+  }
+  _getCurrentLocation() {
+    print('CurrentLocationnotification');
+    geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      _currentPosition = position;
+      final loginarea =  Splash.prefs.getString('userAREA');
+      final  loginid =  Splash.prefs.getString('userID');
+      print(_currentPosition);
+      getuserNotification(loginarea, loginid , _currentPosition.latitude , _currentPosition.longitude).then((value) {
+        print("value is: $value");
+          if(usernewslist.length != 0){
+             print('CurrentLocatification');
+        showDialog(context: context,
+            builder: (BuildContext context) {
+              return
+                CustomDialogBox();
+            });
+          }
+        print('CurrentLocationnotification');
+
+        setState(() {
+          _currentPosition = position;
+          print(_currentPosition);
+
+        });
+      });
+
+
+    }).catchError((e) {
+      print(e);
+    });
+  }
   @override
   initState() {
     // TODO: implement initState
     Home.pr = ProgressDialog(context);
     setBool();
+    datacheck=false;
 
     CheckNew.pr = ProgressDialog(context);
    // addresslist.clear();
 
      final loginarea =  Splash.prefs.getString('userAREA');
-     getnewsbyareacheck( loginarea);
+    // getnewsbyareacheck( loginarea);
     // final  loginid =  Splash.prefs.getString('userID');
     //  print(loginarea);
     //  print(loginid);
     //
     // getusernews( loginarea , loginid );
-   // StartTime();
+
+    StartTime();
     super.initState();
+    // new Future.delayed(Duration.zero, () {
+    //   showDialog(context: context,
+    //       builder: (BuildContext context) {
+    //         return new Container(child: new Text('foo'));
+    //       });
+    // });
+
+
   }
 
 StartTime() async{
- return new Timer.periodic(Duration(seconds: 10), (timer) {
-   final  loginid =  Splash.prefs.getString('userID');
-   print('notification working ');
-   API.getnewsNotification(int.parse(loginid));
-   if(notificationlist.length != 0){
-     CustomDialogBox();
-   }
-   print('notification');
+
+  // new Future.delayed(Duration.zero, () {
+  //   _getCurrentLocation();
+  //     //  final loginarea =  Splash.prefs.getString('userAREA');
+  //     //  final  loginid =  Splash.prefs.getString('userID');
+  //     //  getuserNotification(loginarea, loginid , _currentPosition.latitude , _currentPosition.longitude);
+  //     // // if(usernewslist.length != 0){
+  //     // //     print('CurrentLocationnotification');
+  //     //     showDialog(context: context,
+  //     //         builder: (BuildContext context) {
+  //     //           return
+  //     //             CustomDialogBox();
+  //     //          });
+  //     //   // }
+  //     //   print('CurrentLocationnotification');
+  //
+  // });
+
+ return new Timer.periodic(Duration(seconds: 5), (timer) {
+   print('Notification');
+    _getCurrentLocation();
+ //   final loginarea =  Splash.prefs.getString('userAREA');
+ //   final  loginid =  Splash.prefs.getString('userID');
+ //   // getuserNotification(loginarea, loginid , _currentPosition.latitude , _currentPosition.longitude);
+ // //  if(usernewslist.length != 0){
+ //     print('CurrentLocationnotification');
+ //    CustomDialogBox();
+ // //  }
+ //   print('CurrentLocationnotification');
+   // print('notification');
   });
 }
+
+@override
+  void dispose() {
+    // TODO: implement dispose
+
+    super.dispose();
+  }
 
   final _formKey = GlobalKey<FormState>();
   final newsController = TextEditingController();
@@ -306,9 +422,15 @@ StartTime() async{
                         Spacer(),
                         InkWell(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => CheckNew()),);
+
+                              myFuture = GetState();
+                              if(datacheck==true)
+                                {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => CheckNew()),);
+                                }
+
 
                             },
                             child: Container(

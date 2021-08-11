@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crime_news/Models/GetStateModel.dart';
 import 'package:crime_news/Models/LoginModel.dart';
 import 'package:crime_news/Models/news_model.dart';
 import 'package:crime_news/Models/newsbyareaModel.dart';
@@ -118,9 +119,6 @@ class API{
               msg: 'This E-Mail already exists!', toastLength: Toast.LENGTH_LONG);
         }
           print('This Email ALready Exits');
-
-
-
 
       }
       else if (response.statusCode == 202) {
@@ -250,7 +248,7 @@ class API{
         else if (newsResult == false){
           Home.pr.hide();
           Fluttertoast.showToast(
-              msg: "Its not Crime News",
+              msg: dataResponse.toString(),
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
@@ -336,7 +334,30 @@ class API{
     // }
   }
 
-static getnewsbyareacheck(var  areaname ) async{
+
+  // static Future<getStateModel> GetState() async {
+  //   try {
+  //     final http.Response response =
+  //     await http.get("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetStates");
+  //
+  //     if (response.statusCode == 200) {
+  //       stateList.clear();
+  //       return getStateModel.fromJson(jsonDecode(response.body));
+  //     }
+  //   }
+  //   // on SocketException catch (e) {
+  //   //   throw NoInternetExceptions("No Internet", "assets/internet.png");
+  //   // } on HttpException catch (e) {
+  //   //   throw HttpException("No Service found");
+  //   // } on FormatException catch (e) {
+  //   //   throw InvalidDataFormat("Invalid Data format");
+  //   // }
+  //   catch (e) {
+  //     throw Exception("Unknown Error");
+  //   }
+  // }
+
+  static getnewsbyareacheck(var  areaname ) async{
     success = "false";
     String Url= "http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetUserAlertsbyarea";
 
