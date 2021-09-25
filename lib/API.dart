@@ -266,6 +266,24 @@ class API{
       }
     }).catchError((error) => print(error));
   }
+  static RandomForest(BuildContext context  , news) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Return String
+    String userid = prefs.getString('userID');
+    try {
+      final http.Response response =
+      await http.get("http://207.180.208.2:8079/checknews/" + news );
+
+      if (response.statusCode == 200) {
+
+        Home.pr.hide();
+        return  Fluttertoast.showToast(
+            msg: response.body, toastLength: Toast.LENGTH_LONG);
+      }
+    } catch (e) {
+      throw Exception("Unknown Error");
+    }
+  }
 
   Future<NewsModel> getnewsbyarea(var  areaname ) async{
     // success = "false";

@@ -18,6 +18,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -52,7 +53,7 @@ class _HomeState extends State<Home> {
       await http.get("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetStates");
 
       if (response.statusCode == 200) {
-        stateList.clear();
+        stateList = [];
         datacheck=true;
         return getStateModel.fromJson(jsonDecode(response.body));
       }
@@ -154,9 +155,9 @@ class _HomeState extends State<Home> {
             ));
             success = "true";
           }
-          setState(() {
-            usernewslist;
-          });
+          // setState(() {
+          //   usernewslist;
+          // });
           print('done');
         }
         else{
@@ -185,6 +186,7 @@ class _HomeState extends State<Home> {
         print("value is: $value");
           if(usernewslist.length != 0){
              print('CurrentLocatification');
+             print('ShowNotification');
         showDialog(context: context,
             builder: (BuildContext context) {
               return
@@ -216,14 +218,14 @@ class _HomeState extends State<Home> {
    // addresslist.clear();
 
      final loginarea =  Splash.prefs.getString('userAREA');
-    // getnewsbyareacheck( loginarea);
+     getnewsbyareacheck( loginarea);
     // final  loginid =  Splash.prefs.getString('userID');
     //  print(loginarea);
     //  print(loginid);
     //
-    // getusernews( loginarea , loginid );
+    //  getusernews( loginarea , loginid );
 
-    StartTime();
+     StartTime();
     super.initState();
     // new Future.delayed(Duration.zero, () {
     //   showDialog(context: context,
@@ -483,8 +485,11 @@ StartTime() async{
                         InkWell(
                             onTap: () {
                               if (_formKey.currentState.validate()) {
-                                Home.pr.show();
-                                API.CheckNews(context, newsController.text.toString());
+
+                                sendnews(newsController.text.toString());
+                                 // Home.pr.show();
+                               // // API.CheckNews(context, newsController.text.toString());
+                               //  API.RandomForest(context, newsController.text.toString());
                               }
                             },
                             child: Container(
@@ -520,4 +525,27 @@ StartTime() async{
 
     });
   }
+
+  sendnews(newsss){
+   // List<String> userSearchItems = [];
+    String breaknews = newsss;
+
+   var breaktext = breaknews.split(" ");
+    print(breaktext[0]);
+   // for(int i = 0 ; i <= breaktext.length ; i++){
+   //   userSearchItems[i] = breaktext[i] ;
+   // }
+   if( breaktext.length >4 )
+   {
+     print( "after check length" + breaktext.length.toString());
+     Home.pr.show();
+     API.RandomForest(context, newsss);
+   }
+   else{
+     Fluttertoast.showToast(
+         msg: "Enter Correct News", toastLength: Toast.LENGTH_LONG);
+   }
+
+  }
+
 }

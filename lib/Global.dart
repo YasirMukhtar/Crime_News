@@ -23,7 +23,7 @@ var dataResponse;
 
 var datacheck;
 
-List<ResponseObject> stateList = new List<ResponseObject>();
-List<ResponseObjectCity> citiesList = new List<ResponseObjectCity>();
-List<ResponseObjectDistrict> districtList = new List<ResponseObjectDistrict>();
-List<ResponseObjectTown> townList = new List<ResponseObjectTown>();
+List<ResponseObject> stateList = [];
+List<ResponseObjectCity> citiesList = [];
+List<ResponseObjectDistrict> districtList = [];
+List<ResponseObjectTown> townList = [];

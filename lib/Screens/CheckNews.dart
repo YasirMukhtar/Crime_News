@@ -65,12 +65,14 @@ class _CheckNewState extends State<CheckNew> {
 
    Future<getcityModel> GetCities(var id) async {
     try {
+
       final http.Response response =
       await http.get("http://107.174.33.194/plesk-site-preview/vh.pakgaming.pk/CrimeAlretsApi/GetCitiesByStateId/$id");
 
       if (response.statusCode == 200) {
         citiesList.clear();
-        set();
+
+         set();
         return getcityModel.fromJson(jsonDecode(response.body));
       }
     }
@@ -92,7 +94,10 @@ class _CheckNewState extends State<CheckNew> {
 
       if (response.statusCode == 200) {
         districtList.clear();
-        set();
+        setState(() {
+
+        });
+       // set();
         return getdistrictModel.fromJson(jsonDecode(response.body));
       }
     }
@@ -110,7 +115,7 @@ class _CheckNewState extends State<CheckNew> {
 
   set(){
 
-    new Future.delayed(new Duration(milliseconds: 1500), () {
+    new Future.delayed(new Duration(milliseconds: 1000), () {
       setState(() {
 
       });
@@ -124,7 +129,10 @@ class _CheckNewState extends State<CheckNew> {
 
       if (response.statusCode == 200) {
         townList.clear();
-        set();
+        setState(() {
+
+        });
+       // set();
         return getTownModel.fromJson(jsonDecode(response.body));
 
       }
@@ -299,7 +307,9 @@ class _CheckNewState extends State<CheckNew> {
                             districtList.clear();
                             townList.clear();
                             valueChoose1 = newValue;
-
+                            valueChoose2 = null;
+                            valueChoose3 = null ;
+                            valueChoose4 = null ;
                             print(newValue);
                             GetCities(newValue);
 
@@ -337,12 +347,15 @@ class _CheckNewState extends State<CheckNew> {
                             districtList.clear();
                             townList.clear();
                             valueChoose2 = newValue;
+                            valueChoose3 = null ;
+                            valueChoose4 = null ;
                             print(newValue);
                             GetDistrict(newValue);
                           });
                         },
-                        items: citiesList.map((item)=>DropdownMenuItem<String>(child:
-                        Text(item.name),
+
+                        items: citiesList.map((item)=>DropdownMenuItem<String>(
+                          child: Text(item.name),
                           value: item.cityId.toString(),
                         )
                         ).toList(),
@@ -354,7 +367,7 @@ class _CheckNewState extends State<CheckNew> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                valueChoose2 != null ? Container(
+                valueChoose2 != null && valueChoose1 == '1'  ? Container(
                       width: MediaQuery.of(context).size.width/2.4,
                       padding: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
@@ -376,6 +389,7 @@ class _CheckNewState extends State<CheckNew> {
                         onChanged: (newValue) {
                           setState(() {
                             valueChoose3 = newValue;
+                            valueChoose4 = null ;
                             print(newValue);
                             townList.clear();
                             GetTown(newValue);
@@ -424,9 +438,15 @@ class _CheckNewState extends State<CheckNew> {
                 SizedBox(height: 20,),
                 InkWell(
                     onTap: () {
+                      if(valueChoose1 == '2' || valueChoose1 == "3" || valueChoose1 == "4"){
+                        print(valueChoose2.toString());
+                        getnewsbyareacheck(valueChoose2.toString());
+                      }
+                      else{
 
                       valueChoose4 != null? getnewsbyareacheck(valueChoose4.toString()):   Fluttertoast.showToast(
-                          msg: "Select Fields!", toastLength: Toast.LENGTH_LONG);;
+                          msg: "Select Fields!", toastLength: Toast.LENGTH_LONG);
+                      }
 
                     //   FutureBuilder<NewsModel>(
                     //       future: API().getnewsbyarea(valueChoose4.toString()));
@@ -554,3 +574,9 @@ class _CheckNewState extends State<CheckNew> {
     });
   }
 }
+
+
+
+
+
+
